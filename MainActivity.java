@@ -85,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
         angleEditText.setLayoutParams(layoutParams);
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("输入旋转角度");
+        builder.setTitle("Rotation angle");
         builder.setView(angleEditText);
-        builder.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Sure", new android.content.DialogInterface.OnClickListener() {
             @Override
             public void onClick(android.content.DialogInterface dialog, int which) {
                 String angleStr = angleEditText.getText().toString();
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        builder.setNegativeButton("取消", null);
+        builder.setNegativeButton("Cancel", null);
 
         builder.create().show();
     }
