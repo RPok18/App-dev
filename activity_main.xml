@@ -20,7 +20,14 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp" />
-
+    <Button
+        android:id="@+id/openGalleryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open Gallery"
+        android:layout_toStartOf="@id/filterButton"
+        android:layout_alignBottom="@id/angleButton"
+        android:layout_marginEnd="16dp" />
     <Button
         android:id="@+id/filterButton"
         android:layout_width="wrap_content"
@@ -61,12 +68,6 @@
             android:text="G"
             android:layout_marginStart="16dp" />
 
-        <Button
-            android:id="@+id/openGalleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Open Gallery"
-            android:layout_marginStart="16dp" />
 
     </LinearLayout>
 
