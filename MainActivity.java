@@ -143,14 +143,14 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    // 旋转图片的方法 How to rotate pictures
+   // 旋转图片的方法 How to rotate pictures
     private void rotateImage(int angle) {
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.picture1);
         android.graphics.Matrix matrix = new android.graphics.Matrix();
         matrix.setRotate(angle, originalBitmap.getWidth() / 2f, originalBitmap.getHeight() / 2f);
         Bitmap rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.getWidth(), originalBitmap.getHeight(), matrix, true);
         imageView.setImageBitmap(rotatedBitmap);
     }
+
 
     // 切换滤镜菜单的可见性 Toggle the visibility of the filter menu
     private void toggleFilterMenu() {
@@ -163,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 应用黑白滤镜 Apply black and white filter
     private void applyBlackWhiteFilter() {
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.picture1);
         Bitmap blackWhiteBitmap = Bitmap.createBitmap(originalBitmap.getWidth(), originalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(blackWhiteBitmap);
         Paint paint = new Paint();
@@ -177,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 应用红色滤镜 Apply red filter
     private void applyRedFilter() {
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.picture1);
         Bitmap redBitmap = originalBitmap.copy(originalBitmap.getConfig(), true);
         for (int x = 0; x < redBitmap.getWidth(); x++) {
             for (int y = 0; y < redBitmap.getHeight(); y++) {
@@ -192,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 应用绿色滤镜 Apply green filter
     private void applyGreenFilter() {
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.picture1);
         Bitmap greenBitmap = originalBitmap.copy(originalBitmap.getConfig(), true);
         for (int x = 0; x < greenBitmap.getWidth(); x++) {
             for (int y = 0; y < greenBitmap.getHeight(); y++) {
