@@ -4,14 +4,10 @@
     android:layout_height="match_parent"
     android:background="@drawable/beijing">
 
-    <!-- 图片显示区域 Picture display area-->
-
-    <!-- 输入角度按钮 Enter angle button-->
-
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="450dp"
-        android:layout_height="487dp"
+        android:layout_width="match_parent"
+        android:layout_height="637dp"
         android:adjustViewBounds="true"
         android:src="@drawable/picture1" />
 
@@ -25,9 +21,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- 滤镜按钮 filter button -->
-
-    <!-- 滤镜选项菜单 Filter options menu-->
     <Button
         android:id="@+id/filterButton"
         android:layout_width="wrap_content"
@@ -48,14 +41,12 @@
         android:gravity="center_horizontal"
         android:visibility="gone">
 
-        <!-- 黑白滤镜按钮 Black and white filter button -->
         <Button
             android:id="@+id/blackWhiteFilterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BandW" />
 
-        <!-- 红色滤镜按钮 red filter button-->
         <Button
             android:id="@+id/redFilterButton"
             android:layout_width="wrap_content"
@@ -63,7 +54,6 @@
             android:text="R"
             android:layout_marginStart="16dp" />
 
-        <!-- 绿色滤镜按钮 green filter button -->
         <Button
             android:id="@+id/greenFilterButton"
             android:layout_width="wrap_content"
@@ -71,6 +61,12 @@
             android:text="G"
             android:layout_marginStart="16dp" />
 
+        <Button
+            android:id="@+id/openGalleryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Gallery"
+            android:layout_marginStart="16dp" />
 
     </LinearLayout>
 
