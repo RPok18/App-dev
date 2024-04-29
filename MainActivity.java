@@ -21,6 +21,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int SELECT_PICTURE = 1;
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Button blackWhiteFilterButton;
     private Button redFilterButton;
     private Button greenFilterButton;
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     private Bitmap originalBitmap;
 
@@ -57,41 +62,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        filterButton.setOnClickListener(new View.OnClickListener() {
+        ilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleFilterMenu();
             }
         });
 
-        openGalleryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openGallery();
-            }
-        });
-
         blackWhiteFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                applyBlackWhiteFilter();
+                applyFilterAsync(new Runnable() {
+                    @Override
+                    public void run() {
+                        applyBlackWhiteFilter();
+                    }
+                });
             }
         });
 
         redFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                applyRedFilter();
+                applyFilterAsync(new Runnable() {
+                    @Override
+                    public void run() {
+                        applyRedFilter();
+                    }
+                });
             }
         });
 
         greenFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                applyGreenFilter();
+                applyFilterAsync(new Runnable() {
+                    @Override
+                    public void run() {
+                        applyGreenFilter();
+                    }
+                });
             }
         });
     }
+
+    private void applyFilterAsync(Runnable filterOperation) {
+        executor.execute(filterOperation);
+    }
+
 
     private void openGallery() {
         Intent intent = new Intent();
@@ -143,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-   // 旋转图片的方法 How to rotate pictures
+    // 旋转图片的方法 How to rotate pictures
     private void rotateImage(int angle) {
         android.graphics.Matrix matrix = new android.graphics.Matrix();
         matrix.setRotate(angle, originalBitmap.getWidth() / 2f, originalBitmap.getHeight() / 2f);
