@@ -61,8 +61,13 @@ public class MainActivity extends AppCompatActivity {
                 showAngleInputDialog();
             }
         });
-
-        ilterButton.setOnClickListener(new View.OnClickListener() {
+        openGalleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
+            }
+        });
+        filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleFilterMenu();
