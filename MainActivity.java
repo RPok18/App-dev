@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 显示输入角度对话框 Display the input angle dialog box
-    private void showAngleInputDialog() {
+   private void showAngleInputDialog() {
         final EditText angleEditText = new EditText(this);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -157,7 +157,9 @@ public class MainActivity extends AppCompatActivity {
                 String angleStr = angleEditText.getText().toString();
                 if (!angleStr.isEmpty()) {
                     int angle = Integer.parseInt(angleStr);
-                    rotateImage(angle);
+                    // 调用旋转图片的方法，传入原始位图和旋转角度
+                    Bitmap rotatedBitmap = rotateImage(originalBitmap, angle);
+                    imageView.setImageBitmap(rotatedBitmap);
                 }
             }
         });
@@ -167,13 +169,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 旋转图片的方法 How to rotate pictures
-    private void rotateImage(int angle) {
-        android.graphics.Matrix matrix = new android.graphics.Matrix();
-        matrix.setRotate(angle, originalBitmap.getWidth() / 2f, originalBitmap.getHeight() / 2f);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.getWidth(), originalBitmap.getHeight(), matrix, true);
-        imageView.setImageBitmap(rotatedBitmap);
-    }
+    private Bitmap rotateImage(Bitmap originalBitmap, int angle) {
+        int width = originalBitmap.getWidth();
+        int height = originalBitmap.getHeight();
 
+        // 计算旋转后的图像尺寸 Calculate image size after rotation
+        double radians = Math.toRadians(angle);
+        int newWidth = (int) (Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians)));
+        int newHeight = (int) (Math.abs(height * Math.cos(radians)) + Math.abs(width * Math.sin(radians)));
+
+        // 创建一个新的位图，将图像扩大以容纳旋转后的图像 Create a new bitmap that expands the image to accommodate the rotated image
+        Bitmap rotatedBitmap = Bitmap.createBitmap(newWidth, newHeight, originalBitmap.getConfig());
+
+        // 创建画布，并将原点移动到新位图的中心 Create the canvas and move the origin to the center of the new bitmap
+        Canvas canvas = new Canvas(rotatedBitmap);
+        canvas.translate(newWidth / 2, newHeight / 2);
+        canvas.rotate(angle);
+
+        // 绘制旋转后的图像 Draw rotated image
+        Paint paint = new Paint();
+        canvas.drawBitmap(originalBitmap, -width / 2f, -height / 2f, paint);
+
+        return rotatedBitmap;
+    }
 
     // 切换滤镜菜单的可见性 Toggle the visibility of the filter menu
     private void toggleFilterMenu() {
