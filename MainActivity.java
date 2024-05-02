@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 显示输入角度对话框 Display the input angle dialog box
-   private void showAngleInputDialog() {
+    private void showAngleInputDialog() {
         final EditText angleEditText = new EditText(this);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -243,3 +243,9 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(greenBitmap);
     }
 }
+    private void autoMouseClicked(java.awt.event.MouseEvent evt) {
+        ImageIcon ii = new ImageIcon(getClass().getResource("/Image/image.jpg"));
+        Image image = ii.getImage().getScaledInstance(img.getWidth(), img.getHeight(), Image.SCALE_SMOOTH);
+        ii = new ImageIcon(image);
+        img.setIcon(ii);
+    }
