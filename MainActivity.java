@@ -206,49 +206,26 @@ public class MainActivity extends AppCompatActivity {
 
         builder.create().show();
     }
-    // 显示输入缩放倍数的对话框 Displays a dialog box for entering the zoom factor
-    private void showScaleInputDialog() {
-        final EditText scaleEditText = new EditText(this);
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        scaleEditText.setLayoutParams(layoutParams);
+    private ScaleGestureDetector scaleGestureDetector;
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Scale Factor");
-        builder.setView(scaleEditText);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String scaleStr = scaleEditText.getText().toString();
-                if (!scaleStr.isEmpty()) {
-                    float scaleFactor = Float.parseFloat(scaleStr);
-                    // 缩放图片
-                    Bitmap scaledBitmap = scaleImage(originalBitmap, scaleFactor);
-                    imageView.setImageBitmap(scaledBitmap);
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-
-        builder.create().show();
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        scaleGestureDetector.onTouchEvent(ev);
+        return true;
     }
-    // 缩放图片的方法 How to zoom pictures
-    private Bitmap scaleImage(Bitmap originalBitmap, float scaleFactor) {
-        int width = originalBitmap.getWidth();
-        int height = originalBitmap.getHeight();
 
-        // 计算缩放后的图像尺寸 Calculate the scaled image size
-        int newWidth = (int) (width * scaleFactor);
-        int newHeight = (int) (height * scaleFactor);
-
-        // 创建缩放后的位图 Create a scaled bitmap
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
-
-        return scaledBitmap;
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            float scaleFactor = detector.getScaleFactor();
+            // Scale your image here
+            Bitmap scaledBitmap = scaleImage(originalBitmap, scaleFactor);
+            imageView.setImageBitmap(scaledBitmap);
+            return true;
+        }
     }
+
     // 旋转图片的方法 How to rotate pictures
     private Bitmap rotateImage(Bitmap originalBitmap, int angle) {
         int width = originalBitmap.getWidth();
