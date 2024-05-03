@@ -4,12 +4,19 @@
     android:layout_height="match_parent"
     android:background="@drawable/beijing">
 
-    <ImageView
-        android:id="@+id/imageView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="637dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/picture1" />
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/picture1"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
 
     <Button
         android:id="@+id/angleButton"
@@ -20,11 +27,22 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/scaleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="111dp"
+        android:layout_marginBottom="14dp"
+        android:text="scale" />
+
     <Button
         android:id="@+id/openGalleryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open Gallery"
+        android:text="Open"
         android:layout_toStartOf="@id/filterButton"
         android:layout_alignBottom="@id/angleButton"
         android:layout_marginEnd="16dp" />
@@ -38,9 +56,9 @@
         android:layout_marginBottom="17dp"
         android:text="filter" />
 
-    <LinearLayout
+    <HorizontalScrollView
         android:id="@+id/filterMenu"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_above="@id/filterButton"
@@ -48,27 +66,44 @@
         android:gravity="center_horizontal"
         android:visibility="gone">
 
-        <Button
-            android:id="@+id/blackWhiteFilterButton"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BandW" />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/redFilterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="R"
-            android:layout_marginStart="16dp" />
+            <Button
+                android:id="@+id/blackWhiteFilterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BandW" />
 
-        <Button
-            android:id="@+id/greenFilterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="G"
-            android:layout_marginStart="16dp" />
+            <Button
+                android:id="@+id/redFilterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R"
+                android:layout_marginStart="16dp" />
 
+            <Button
+                android:id="@+id/greenFilterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="G"
+                android:layout_marginStart="16dp" />
+            <Button
+                android:id="@+id/blueFilterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="B"
+                android:layout_marginStart="16dp" />
+            <Button
+                android:id="@+id/primaryFilterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="P"
+                android:layout_marginStart="16dp" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </RelativeLayout>
