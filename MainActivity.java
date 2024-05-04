@@ -19,11 +19,11 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.io.IOException;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import android.view.ScaleGestureDetector;
+import android.view.MotionEvent;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         });
         blueFilterButton = findViewById(R.id.blueFilterButton);
         primaryFilterButton = findViewById(R.id.primaryFilterButton);
-
+        scaleGestureDetector = new ScaleGestureDetector(getApplicationContext(), new ScaleListener());
         blueFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
         });
 
         primaryFilterButton.setOnClickListener(new View.OnClickListener() {
@@ -206,7 +207,49 @@ public class MainActivity extends AppCompatActivity {
 
         builder.create().show();
     }
+    // 显示输入缩放倍数的对话框
+    private void showScaleInputDialog() {
+        final EditText scaleEditText = new EditText(this);
 
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        scaleEditText.setLayoutParams(layoutParams);
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Scale Factor");
+        builder.setView(scaleEditText);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String scaleStr = scaleEditText.getText().toString();
+                if (!scaleStr.isEmpty()) {
+                    float scaleFactor = Float.parseFloat(scaleStr);
+                    // 缩放图片
+                    Bitmap scaledBitmap = scaleImage(originalBitmap, scaleFactor);
+                    imageView.setImageBitmap(scaledBitmap);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+
+        builder.create().show();
+    }
+    // 缩放图片的方法
+    private Bitmap scaleImage(Bitmap originalBitmap, float scaleFactor) {
+        int width = originalBitmap.getWidth();
+        int height = originalBitmap.getHeight();
+
+        // 计算缩放后的图像尺寸
+        int newWidth = (int) (width * scaleFactor);
+        int newHeight = (int) (height * scaleFactor);
+
+        // 创建缩放后的位图
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+
+        return scaledBitmap;
+    }
     private ScaleGestureDetector scaleGestureDetector;
 
     @Override
@@ -216,12 +259,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        private float scaleFactor = 1.0f;
+
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            float scaleFactor = detector.getScaleFactor();
-            // Scale your image here
-            Bitmap scaledBitmap = scaleImage(originalBitmap, scaleFactor);
+            scaleFactor *= detector.getScaleFactor();
+            scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f));
+
+            // 缩放图片
+            int newWidth = (int) (originalBitmap.getWidth() * scaleFactor);
+            int newHeight = (int) (originalBitmap.getHeight() * scaleFactor);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
             imageView.setImageBitmap(scaledBitmap);
+
             return true;
         }
     }
