@@ -31,20 +31,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int SELECT_PICTURE = 1;
 
     private ImageView imageView;
-    private Button angleButton;
-    private Button filterButton;
-    private Button openGalleryButton;
+    private Button angleButton, filterButton, openGalleryButton;
     private HorizontalScrollView filterMenu;
-    private Button blackWhiteFilterButton;
-    private Button redFilterButton;
-    private Button greenFilterButton;
+    private Button blackWhiteFilterButton, redFilterButton, greenFilterButton, blueFilterButton, primaryFilterButton;
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-
     private Bitmap originalBitmap;
-    private Button blueFilterButton;
-    private Button primaryFilterButton;
-    private Button scaleButton;
-    @Override
+    private ImageScaler imageScaler;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -57,7 +50,13 @@ public class MainActivity extends AppCompatActivity {
         blackWhiteFilterButton = findViewById(R.id.blackWhiteFilterButton);
         redFilterButton = findViewById(R.id.redFilterButton);
         greenFilterButton = findViewById(R.id.greenFilterButton);
-        scaleButton = findViewById(R.id.scaleButton);
+        blueFilterButton = findViewById(R.id.blueFilterButton);
+        primaryFilterButton = findViewById(R.id.primaryFilterButton);
+
+        setupButtons();
+    }
+
+    private void setupButtons(){
 
         angleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,10 +139,12 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        scaleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showScaleInputDialog();
+        ImageScaler.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            return imageScaler.onTouchEvent(event) || super.onTouchEvent(event);
+        }
+    }
             }
         });
 
@@ -162,20 +163,20 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            try {
-                originalBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
-                imageView.setImageBitmap(originalBitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK && data != null) {
+        Uri selectedImage = data.getData();
+        try {
+        originalBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+        imageView.setImageBitmap(originalBitmap);
+        imageScaler = new ImageScaler(getApplicationContext(), imageView, originalBitmap);
+        } catch (IOException e) {
+        e.printStackTrace();
         }
-    }
+        }
+        }
 
     // 显示输入角度对话框 Display the input angle dialog box
 
@@ -207,56 +208,13 @@ public class MainActivity extends AppCompatActivity {
 
         builder.create().show();
     }
-    // 显示输入缩放倍数的对话框
-    private void showScaleInputDialog() {
-        final EditText scaleEditText = new EditText(this);
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        scaleEditText.setLayoutParams(layoutParams);
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Scale Factor");
-        builder.setView(scaleEditText);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String scaleStr = scaleEditText.getText().toString();
-                if (!scaleStr.isEmpty()) {
-                    float scaleFactor = Float.parseFloat(scaleStr);
-                    // 缩放图片
-                    Bitmap scaledBitmap = scaleImage(originalBitmap, scaleFactor);
-                    imageView.setImageBitmap(scaledBitmap);
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-
-        builder.create().show();
-    }
-    // 缩放图片的方法
-    private Bitmap scaleImage(Bitmap originalBitmap, float scaleFactor) {
-        int width = originalBitmap.getWidth();
-        int height = originalBitmap.getHeight();
-
-        // 计算缩放后的图像尺寸
-        int newWidth = (int) (width * scaleFactor);
-        int newHeight = (int) (height * scaleFactor);
-
-        // 创建缩放后的位图
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
-
-        return scaledBitmap;
-    }
     private ScaleGestureDetector scaleGestureDetector;
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        scaleGestureDetector.onTouchEvent(ev);
-        return true;
-    }
+@Override
+public boolean onTouchEvent(MotionEvent event) {
+        return imageScaler.onTouchEvent(event) || super.onTouchEvent(event);
+        }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         private float scaleFactor = 1.0f;
