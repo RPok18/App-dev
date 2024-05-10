@@ -1,0 +1,40 @@
+package com.example.myapplication;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class AnotherActivity extends AppCompatActivity {
+
+    private DrawingView drawingView;
+    private ToggleButton interpolationToggle;
+    private Button clearButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_another);
+
+        drawingView = findViewById(R.id.drawingView);
+        interpolationToggle = findViewById(R.id.interpolationToggle);
+        clearButton = findViewById(R.id.clearButton);
+
+        interpolationToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                drawingView.setInterpolationEnabled(isChecked);
+            }
+        });
+
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawingView.clear();
+            }
+        });
+    }
+}
