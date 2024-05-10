@@ -1,0 +1,109 @@
+package com.example.myapplication;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import java.util.ArrayList;
+import android.graphics.DashPathEffect;
+
+public class DrawingView extends View {
+
+    private ArrayList<Float> pointsX = new ArrayList<>();
+    private ArrayList<Float> pointsY = new ArrayList<>();
+    private boolean isInterpolationEnabled = false;
+
+    private Paint paint;
+    private Path path;
+
+    public DrawingView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
+        paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        paint.setAntiAlias(true);
+        paint.setColor(getResources().getColor(android.R.color.black));
+        paint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0));
+        path = new Path(); // 初始化路径对象
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (!pointsX.isEmpty()) {
+            if (isInterpolationEnabled) {
+                drawInterpolatedPath(canvas);
+            } else {
+                drawOriginalPath(canvas);
+            }
+        }
+    }
+
+    private void drawOriginalPath(Canvas canvas) {
+        paint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0)); // 设置为虚线样式
+        path.reset();
+        for (int i = 0; i < pointsX.size(); i++) {
+            float x = pointsX.get(i);
+            float y = pointsY.get(i);
+            if (i == 0) {
+                path.moveTo(x, y);
+            } else {
+                path.lineTo(x, y);
+            }
+        }
+        canvas.drawPath(path, paint);
+    }
+
+    private void drawInterpolatedPath(Canvas canvas) {
+        paint.setPathEffect(null); // 设置为实线样式
+        path.reset();
+        for (int i = 0; i < pointsX.size(); i++) {
+            float x = pointsX.get(i);
+            float y = pointsY.get(i);
+            if (i == 0) {
+                path.moveTo(x, y);
+            } else {
+                path.lineTo(x, y);
+            }
+        }
+        canvas.drawPath(path, paint);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                pointsX.add(x);
+                pointsY.add(y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                pointsX.add(x);
+                pointsY.add(y);
+                invalidate();
+                break;
+        }
+        return true;
+    }
+
+    public void setInterpolationEnabled(boolean enabled) {
+        isInterpolationEnabled = enabled;
+        invalidate();
+    }
+
+    public void clear() {
+        pointsX.clear();
+        pointsY.clear();
+        invalidate();
+    }
+}
