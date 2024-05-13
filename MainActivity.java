@@ -18,9 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import android.content.DialogInterface;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final int SELECT_PICTURE = 1;
-
     private ImageView imageView;
     private Button angleButton;
     private Button filterButton;
@@ -30,17 +28,17 @@ public class MainActivity extends AppCompatActivity {
     private Button redFilterButton;
     private Button greenFilterButton;
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-
     private Bitmap originalBitmap;
     private Button blueFilterButton;
     private Button primaryFilterButton;
     private Button scaleButton;
+    private Button cubeButton;
+    private Button newbButton; // 新添加的按钮
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         imageView = findViewById(R.id.imageView);
         angleButton = findViewById(R.id.angleButton);
         filterButton = findViewById(R.id.filterButton);
@@ -50,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         redFilterButton = findViewById(R.id.redFilterButton);
         greenFilterButton = findViewById(R.id.greenFilterButton);
         scaleButton = findViewById(R.id.scaleButton);
+        newbButton = findViewById(R.id.newb); // 初始化newb按钮
 
         angleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,21 +64,29 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         openGalleryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openGallery();
             }
         });
-
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleFilterMenu();
             }
         });
-
+        // 初始化cubeButton
+        cubeButton = findViewById(R.id.editModeButton);
+        // 设置cubeButton的点击事件监听器
+        cubeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 启动CubeActivity
+                Intent intent = new Intent(MainActivity.this, CubeActivity.class);
+                startActivity(intent);
+            }
+        });
         blackWhiteFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         redFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         greenFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,10 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         blueFilterButton = findViewById(R.id.blueFilterButton);
         primaryFilterButton = findViewById(R.id.primaryFilterButton);
-
         blueFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         primaryFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +152,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showScaleInputDialog();
+            }
+        });
+
+        // 设置newbButton的点击事件监听器
+        newbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showUnsharpInputDialog();
             }
         });
     }
@@ -188,23 +198,21 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         angleEditText.setLayoutParams(layoutParams);
-
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Rotation angle");
+        builder.setTitle("旋转角度");
         builder.setView(angleEditText);
-        builder.setPositiveButton("Sure", new android.content.DialogInterface.OnClickListener() {
+        builder.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
             @Override
             public void onClick(android.content.DialogInterface dialog, int which) {
                 String angleStr = angleEditText.getText().toString();
                 if (!angleStr.isEmpty()) {
                     int angle = Integer.parseInt(angleStr);
-                    // 调用旋转图片的方法，传入原始位图和旋转角度
                     Bitmap rotatedBitmap = ImageProcessor.rotateImage(originalBitmap, angle);
                     imageView.setImageBitmap(rotatedBitmap);
                 }
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("取消", null);
 
         builder.create().show();
     }
@@ -217,23 +225,21 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         scaleEditText.setLayoutParams(layoutParams);
-
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Scale Factor");
+        builder.setTitle("缩放因子");
         builder.setView(scaleEditText);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String scaleStr = scaleEditText.getText().toString();
                 if (!scaleStr.isEmpty()) {
                     float scaleFactor = Float.parseFloat(scaleStr);
-                    // 缩放图片
                     Bitmap scaledBitmap = ImageProcessor.scaleImage(originalBitmap, scaleFactor);
-                    imageView.setImageBitmap(scaledBitmap);}
+                    imageView.setImageBitmap(scaledBitmap);
+                }
             }
         });
-        builder.setNegativeButton("Cancel", null);
-
+        builder.setNegativeButton("取消", null);
         builder.create().show();
     }
 
@@ -249,4 +255,29 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(originalBitmap);
     }
 
+    private void showUnsharpInputDialog() {
+        final EditText unsharpEditText = new EditText(this);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        unsharpEditText.setLayoutParams(layoutParams);
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("请输入锐化比率");
+        builder.setView(unsharpEditText);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String unsharpStr = unsharpEditText.getText().toString();
+                if (!unsharpStr.isEmpty()) {
+                    float unsharpFactor = Float.parseFloat(unsharpStr);
+                    Bitmap sharpenedBitmap = UnsharpMask.applyUnsharpMask(originalBitmap, unsharpFactor);
+                    imageView.setImageBitmap(sharpenedBitmap);
+                }
+            }
+        });
+        builder.setNegativeButton("取消", null);
+        builder.create().show();
+    }
 }
