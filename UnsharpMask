@@ -1,0 +1,50 @@
+package com.example.myapplication;
+
+import android.graphics.Bitmap;
+
+public class UnsharpMask {
+    public static Bitmap applyUnsharpMask(Bitmap originalBitmap, float unsharpFactor) {
+        int width = originalBitmap.getWidth();
+        int height = originalBitmap.getHeight();
+        Bitmap sharpenedBitmap = Bitmap.createBitmap(width, height, originalBitmap.getConfig());
+
+        int[] pixels = new int[width * height];
+        originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int A = 0, R = 0, G = 0, B = 0;
+        int pixel;
+        int index;
+        int sumR, sumG, sumB;
+
+        int[][] matrix = {{-1, -2, -1}, {-2, 28, -2}, {-1, -2, -1}}; // Optimized matrix for better sharpening
+
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
+                sumR = sumG = sumB = 0;
+                for (int j = -1; j <= 1; j++) {
+                    for (int i = -1; i <= 1; i++) {
+                        index = (y + j) * width + (x + i);
+                        pixel = pixels[index];
+                        A = (pixel >> 24) & 0xff;
+                        R = (pixel >> 16) & 0xff;
+                        G = (pixel >> 8) & 0xff;
+                        B = pixel & 0xff;
+                        sumR += (R * matrix[j + 1][i + 1]);
+                        sumG += (G * matrix[j + 1][i + 1]);
+                        sumB += (B * matrix[j + 1][i + 1]);
+                    }
+                }
+                sumR = Math.min(Math.max(sumR, 0), 255);
+                sumG = Math.min(Math.max(sumG, 0), 255);
+                sumB = Math.min(Math.max(sumB, 0), 255);
+
+                R = (int) (R + (R - sumR) * unsharpFactor); // Apply unsharp mask to each channel separately
+                G = (int) (G + (G - sumG) * unsharpFactor);
+                B = (int) (B + (B - sumB) * unsharpFactor);
+
+                sharpenedBitmap.setPixel(x, y, (A << 24) | (R << 16) | (G << 8) | B);
+            }
+        }
+        return sharpenedBitmap;
+    }
+}
