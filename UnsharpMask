@@ -11,7 +11,7 @@ public class UnsharpMask {
         int[] pixels = new int[width * height];
         originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
-        int A = 0, R = 0, G = 0, B = 0;
+        int A = 0, R, G, B;
         int pixel;
         int index;
         int sumR, sumG, sumB;
@@ -34,13 +34,19 @@ public class UnsharpMask {
                         sumB += (B * matrix[j + 1][i + 1]);
                     }
                 }
+
                 sumR = Math.min(Math.max(sumR, 0), 255);
                 sumG = Math.min(Math.max(sumG, 0), 255);
                 sumB = Math.min(Math.max(sumB, 0), 255);
 
-                R = (int) (R + (R - sumR) * unsharpFactor); // Apply unsharp mask to each channel separately
-                G = (int) (G + (G - sumG) * unsharpFactor);
-                B = (int) (B + (B - sumB) * unsharpFactor);
+                int originalPixel = pixels[y * width + x];
+                int originalR = (originalPixel >> 16) & 0xff;
+                int originalG = (originalPixel >> 8) & 0xff;
+                int originalB = originalPixel & 0xff;
+
+                R = Math.min(Math.max((int) (originalR + (originalR - sumR) * unsharpFactor), 0), 255);
+                G = Math.min(Math.max((int) (originalG + (originalG - sumG) * unsharpFactor), 0), 255);
+                B = Math.min(Math.max((int) (originalB + (originalB - sumB) * unsharpFactor), 0), 255);
 
                 sharpenedBitmap.setPixel(x, y, (A << 24) | (R << 16) | (G << 8) | B);
             }
