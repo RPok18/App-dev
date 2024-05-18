@@ -4,20 +4,23 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
-import android.graphics.DashPathEffect;
+import java.util.List;
 
 public class DrawingView extends View {
 
-    private ArrayList<Float> pointsX = new ArrayList<>();
-    private ArrayList<Float> pointsY = new ArrayList<>();
-    private boolean isInterpolationEnabled = false;
+    private List<PointF> points = new ArrayList<>();
+    private boolean isInterpolationEnabled = false; // Default to false
 
     private Paint paint;
     private Path path;
+    private float tension = 0.5f; // Default tension for spline curves
+    private static final float MIN_DISTANCE = 40f; // Minimum distance between points
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -27,73 +30,98 @@ public class DrawingView extends View {
     private void init() {
         paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(10); // Set the stroke width to make lines thicker
         paint.setAntiAlias(true);
-        paint.setColor(getResources().getColor(android.R.color.black));
-        paint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0));
-        path = new Path(); // 初始化路径对象
+        paint.setColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        path = new Path();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (!pointsX.isEmpty()) {
+        if (!points.isEmpty()) {
             if (isInterpolationEnabled) {
-                drawInterpolatedPath(canvas);
+                drawSmoothCurve(canvas);
             } else {
-                drawOriginalPath(canvas);
+                drawPoints(canvas);
             }
         }
     }
 
-    private void drawOriginalPath(Canvas canvas) {
-        paint.setPathEffect(new DashPathEffect(new float[]{10, 5}, 0)); // 设置为虚线样式
-        path.reset();
-        for (int i = 0; i < pointsX.size(); i++) {
-            float x = pointsX.get(i);
-            float y = pointsY.get(i);
-            if (i == 0) {
-                path.moveTo(x, y);
-            } else {
-                path.lineTo(x, y);
-            }
+    private void drawPoints(Canvas canvas) {
+        for (PointF point : points) {
+            canvas.drawCircle(point.x, point.y, 8, paint);
         }
-        canvas.drawPath(path, paint);
     }
 
-    private void drawInterpolatedPath(Canvas canvas) {
-        paint.setPathEffect(null); // 设置为实线样式
+    private void drawSmoothCurve(Canvas canvas) {
         path.reset();
-        for (int i = 0; i < pointsX.size(); i++) {
-            float x = pointsX.get(i);
-            float y = pointsY.get(i);
-            if (i == 0) {
-                path.moveTo(x, y);
-            } else {
-                path.lineTo(x, y);
+        if (points.size() == 1) {
+            PointF point = points.get(0);
+            canvas.drawCircle(point.x, point.y, 8, paint);
+        } else if (points.size() >= 2) {
+            for (int i = 0; i < points.size() - 1; i++) {
+                PointF p0, p1, p2, p3;
+                if (i == 0) {
+                    p0 = points.get(0);
+                    path.moveTo(p0.x, p0.y);
+                } else {
+                    p0 = points.get(i - 1);
+                }
+                p1 = points.get(i);
+                p2 = points.get(i + 1);
+                if (i + 2 < points.size()) {
+                    p3 = points.get(i + 2);
+                } else {
+                    p3 = p2;
+                }
+
+                float x1 = p1.x + (p2.x - p0.x) * tension;
+                float y1 = p1.y + (p2.y - p0.y) * tension;
+                float x2 = p2.x - (p3.x - p1.x) * tension;
+                float y2 = p2.y - (p3.y - p1.y) * tension;
+
+                path.cubicTo(x1, y1, x2, y2, p2.x, p2.y);
+
+                canvas.drawCircle(p1.x, p1.y, 8, paint);
             }
+            PointF lastPoint = points.get(points.size() - 1);
+            canvas.drawCircle(lastPoint.x, lastPoint.y, 8, paint);
+
+            canvas.drawPath(path, paint);
         }
-        canvas.drawPath(path, paint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (isInterpolationEnabled) {
+            return true; // Disable touch events when interpolation is enabled
+        }
+
         float x = event.getX();
         float y = event.getY();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                pointsX.add(x);
-                pointsY.add(y);
+                addPoint(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                pointsX.add(x);
-                pointsY.add(y);
-                invalidate();
+                float lastX = points.get(points.size() - 1).x;
+                float lastY = points.get(points.size() - 1).y;
+                float dx = Math.abs(x - lastX);
+                float dy = Math.abs(y - lastY);
+                if (dx >= MIN_DISTANCE || dy >= MIN_DISTANCE) {
+                    addPoint(x, y);
+                    invalidate();
+                }
                 break;
         }
         return true;
+    }
+
+    private void addPoint(float x, float y) {
+        points.add(new PointF(x, y));
     }
 
     public void setInterpolationEnabled(boolean enabled) {
@@ -101,9 +129,13 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    public void setTension(float tension) {
+        this.tension = tension;
+        invalidate();
+    }
+
     public void clear() {
-        pointsX.clear();
-        pointsY.clear();
+        points.clear();
         invalidate();
     }
 }
