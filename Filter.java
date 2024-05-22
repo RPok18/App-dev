@@ -1,8 +1,6 @@
 package com.example.myapplication;
 
-
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 public class Filter {
 
@@ -55,5 +53,29 @@ public class Filter {
             }
         }
         return blueBitmap;
+    }
+
+    public static Bitmap applyOrangeFilter(Bitmap originalBitmap) {
+        Bitmap orangeBitmap = originalBitmap.copy(originalBitmap.getConfig(), true);
+        for (int x = 0; x < orangeBitmap.getWidth(); x++) {
+            for (int y = 0; y < orangeBitmap.getHeight(); y++) {
+                int pixel = orangeBitmap.getPixel(x, y);
+                int alpha = android.graphics.Color.alpha(pixel);
+                int red = android.graphics.Color.red(pixel);
+                int green = android.graphics.Color.green(pixel);
+                int blue = android.graphics.Color.blue(pixel);
+                // 这里调整红色和绿色的分量，以产生橙色效果
+                red = red * 2; // 增加红色分量
+                green = green / 2; // 减少绿色分量
+                blue = blue / 4; // 减少蓝色分量
+                orangeBitmap.setPixel(x, y, android.graphics.Color.argb(alpha, red, green, blue));
+            }
+        }
+        return orangeBitmap;
+    }
+
+    public static Bitmap applyPrimaryColorFilter(Bitmap src) {
+        return src;
+
     }
 }
